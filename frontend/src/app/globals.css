@@ -1,0 +1,152 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+:root {
+  --ink-black: #0B0B0F;
+  --indigo-panel: #2E1A47;
+  --magenta-accent: #F71B6A;
+  --yellow-xp: #F5D90A;
+  --off-white: #F2F0EA;
+}
+
+@layer base {
+  body {
+    background-color: var(--ink-black);
+    color: var(--off-white);
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Archivo Black', sans-serif;
+    text-transform: uppercase;
+  }
+  
+  /* Focus rings for accessibility */
+  *:focus-visible {
+    outline: 3px solid var(--magenta-accent) !important;
+    outline-offset: 3px;
+  }
+}
+
+/* Typography utilities */
+.display-font {
+  font-family: 'Archivo Black', sans-serif;
+  text-transform: uppercase;
+}
+
+/* Comic Panel */
+.comic-panel {
+  background-color: var(--indigo-panel);
+  border: 4px solid var(--ink-black);
+  position: relative;
+  overflow: hidden;
+  border-radius: 0; /* Sharp corners */
+  /* Slide/snap animation */
+  animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
+  /* Ensure a light border if it's placed on the ink black background to separate */
+  box-shadow: 0 0 0 3px var(--indigo-panel); /* Creates a double border effect */
+}
+
+/* Halftone Texture SVG */
+.comic-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.3;
+  background-image: radial-gradient(var(--ink-black) 25%, transparent 25%);
+  background-size: 6px 6px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.comic-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Glitch micro-interaction */
+@keyframes glitch-border {
+  0% { box-shadow: 5px 0 0 var(--magenta-accent), -5px 0 0 cyan; transform: translate(3px, 0); }
+  20% { box-shadow: -5px 0 0 var(--magenta-accent), 5px 0 0 cyan; transform: translate(-3px, 3px); }
+  40% { box-shadow: 5px -5px 0 var(--magenta-accent), -5px 5px 0 cyan; transform: translate(3px, -3px); }
+  60% { box-shadow: -5px 5px 0 var(--magenta-accent), 5px -5px 0 cyan; transform: translate(-3px, 3px); }
+  80% { box-shadow: 5px 0 0 var(--magenta-accent), -5px 0 0 cyan; transform: translate(3px, 0); }
+  100% { box-shadow: 0 0 0 var(--indigo-panel); transform: translate(0); }
+}
+
+.glitch-active {
+  animation: glitch-border 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .comic-panel {
+    animation: none;
+  }
+  .glitch-active {
+    animation: none;
+  }
+}
+
+/* Custom UI elements */
+.btn-primary {
+  background-color: var(--magenta-accent);
+  color: var(--off-white);
+  font-family: 'Archivo Black', sans-serif;
+  text-transform: uppercase;
+  padding: 0.85rem 1.75rem;
+  border: 4px solid var(--ink-black);
+  transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+}
+
+.btn-primary:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 5px 5px 0 var(--ink-black);
+}
+
+.btn-primary:active {
+  transform: translate(0, 0);
+  box-shadow: 0 0 0 var(--ink-black);
+}
+
+.progress-bar-container {
+  background-color: var(--ink-black);
+  border: 3px solid var(--ink-black);
+  height: 28px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  background-color: var(--yellow-xp);
+  height: 100%;
+  /* Tape stripe effect */
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 12px,
+    rgba(11, 11, 15, 0.2) 12px,
+    rgba(11, 11, 15, 0.2) 24px
+  );
+}
+
+.cleared-stamp {
+  color: var(--magenta-accent);
+  border: 4px solid var(--magenta-accent);
+  font-family: 'Archivo Black', sans-serif;
+  text-transform: uppercase;
+  transform: rotate(-12deg);
+  display: inline-block;
+  padding: 3px 10px;
+  font-size: 0.85rem;
+  opacity: 0.95;
+  font-weight: 900;
+}
