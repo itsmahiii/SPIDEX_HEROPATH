@@ -34,12 +34,11 @@ export async function callOpenRouter(prompt: string, model: string = "anthropic/
     const data = await response.json();
     let aiText = data.choices[0].message.content || "";
     
-    // Clean potential markdown blocks
-    aiText = aiText.trim();
-    if (aiText.startsWith('```json')) {
-      aiText = aiText.replace(/^```json/, '').replace(/```$/, '').trim();
-    } else if (aiText.startsWith('```')) {
-      aiText = aiText.replace(/^```/, '').replace(/```$/, '').trim();
+    // Extract the JSON object robustly by finding the first { and last }
+    const firstBrace = aiText.indexOf('{');
+    const lastBrace = aiText.lastIndexOf('}');
+    if (firstBrace !== -1 && lastBrace !== -1 && lastBrace >= firstBrace) {
+      aiText = aiText.substring(firstBrace, lastBrace + 1);
     }
 
     // Try parsing
