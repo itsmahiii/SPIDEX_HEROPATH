@@ -49,11 +49,11 @@ export async function callOpenRouter(prompt: string, model?: string, retries: nu
         if (!response.ok) {
           const errorText = await response.text();
           console.error(`[OpenRouter] API error with ${currentModel}: ${response.status} - ${errorText}`);
+          lastError = new Error(`OpenRouter API error (${currentModel}): ${response.status} - ${errorText}`);
           // Don't retry this model if it's a 4xx error (invalid model, auth issue, etc.)
           if (response.status >= 400 && response.status < 500) {
             break; // Try the next model instead
           }
-          lastError = new Error(`OpenRouter API error (${currentModel}): ${response.status} - ${errorText}`);
           continue; // Retry same model on 5xx
         }
 
