@@ -42,12 +42,8 @@ ${textContent}
 
 Return ONLY the raw JSON object, no markdown blocks, no other text.`;
 
-    // Try Claude 3.5 Sonnet first via OpenRouter. 
-    // Fallback or budget option: "meta-llama/llama-3.3-70b-instruct:free" or "google/gemini-2.0-flash-exp:free"
-    const model = process.env.AI_MODEL || "google/gemini-2.0-flash-exp:free";
-    
-    // Using the helper with auto-retry on parse failure
-    const parsedJson = await callOpenRouter(prompt, model);
+    // Using the helper with auto-retry and multi-model fallback
+    const parsedJson = await callOpenRouter(prompt);
 
     // 3. (Optional for MVP local dev) Upload file to Supabase Storage
     let fileUrl = 'local-demo-url.pdf';
