@@ -44,7 +44,7 @@ Return ONLY the raw JSON object, no markdown blocks, no other text.`;
 
     // Try Claude 3.5 Sonnet first via OpenRouter. 
     // Fallback or budget option: "meta-llama/llama-3.3-70b-instruct:free" or "google/gemini-2.0-flash-exp:free"
-    const model = process.env.AI_MODEL || "nvidia/nemotron-3-ultra-550b-a55b:free";
+    const model = process.env.AI_MODEL || "google/gemini-2.0-flash-exp:free";
     
     // Using the helper with auto-retry on parse failure
     const parsedJson = await callOpenRouter(prompt, model);
