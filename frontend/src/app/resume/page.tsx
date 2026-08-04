@@ -47,7 +47,7 @@ export default function ResumeOraclePage() {
         .order('uploaded_at', { ascending: false });
         
       if (data && !error) {
-        const mapped = data.map(v => ({
+        const mapped = data.map((v: any) => ({
           id: v.id,
           targetRole: v.target_role,
           date: v.uploaded_at,
