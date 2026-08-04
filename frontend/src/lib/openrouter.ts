@@ -1,8 +1,6 @@
-// List of free models to try in order of reliability
+// Use OpenRouter's built-in free router - it automatically picks from whatever free models are currently available
 const FREE_MODELS = [
-  "google/gemini-2.0-flash-exp:free",
-  "meta-llama/llama-3.3-70b-instruct:free",
-  "mistralai/mistral-7b-instruct:free",
+  "openrouter/free",
 ];
 
 export async function callOpenRouter(prompt: string, model?: string, retries: number = 2): Promise<any> {
