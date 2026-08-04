@@ -1,6 +1,7 @@
 import "./globals.css";
 import Link from "next/link";
 import { Metadata } from "next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "HeroPath - Train the Next Hero",
@@ -31,6 +32,7 @@ export default function RootLayout({
         <main className="flex-1 flex flex-col">
           {children}
         </main>
+        <SpeedInsights />
       </body>
     </html>
   );
