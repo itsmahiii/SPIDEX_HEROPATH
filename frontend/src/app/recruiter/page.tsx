@@ -86,7 +86,7 @@ export default function RecruiterPortalPage() {
       {/* Results Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredCandidates.map((candidate, idx) => (
-          <div key={candidate.id} className="comic-panel p-6 flex flex-col hover:border-[#F5D90A] transition-colors cursor-pointer group" style={{ animationDelay: \`\${idx * 0.1}s\` }}>
+          <div key={candidate.id} className="comic-panel p-6 flex flex-col hover:border-[#F5D90A] transition-colors cursor-pointer group" style={{ animationDelay: `${idx * 0.1}s` }}>
             
             <div className="flex justify-between items-start mb-4">
               <div>
