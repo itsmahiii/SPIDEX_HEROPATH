@@ -1,3 +1,4 @@
+export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { callOpenRouter } from '@/lib/openrouter';
 
@@ -31,3 +32,4 @@ Return ONLY the raw JSON object. No other text.`;
     return NextResponse.json({ error: error.message || 'Failed to generate challenge' }, { status: 500 });
   }
 }
+

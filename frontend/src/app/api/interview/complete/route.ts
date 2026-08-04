@@ -1,3 +1,4 @@
+export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/utils/supabase';
 import { callOpenRouter } from '@/lib/openrouter';
@@ -115,3 +116,4 @@ Return ONLY JSON. No other text.`;
     return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 }
+

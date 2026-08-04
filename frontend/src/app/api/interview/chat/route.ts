@@ -1,3 +1,4 @@
+export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { callOpenRouter } from '@/lib/openrouter';
 
@@ -82,3 +83,4 @@ Return ONLY the raw JSON object. No other text.`;
     return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 }
+

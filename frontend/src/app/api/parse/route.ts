@@ -1,3 +1,4 @@
+export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/utils/supabase';
 import { callOpenRouter } from '@/lib/openrouter';
@@ -100,3 +101,4 @@ Return ONLY the raw JSON object, no markdown blocks, no other text.`;
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+

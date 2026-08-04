@@ -74,10 +74,16 @@ export default function ResumeOraclePage() {
         body: formData,
       });
 
-      const result = await response.json();
+      let result;
+      const textResponse = await response.text();
+      try {
+        result = JSON.parse(textResponse);
+      } catch (e) {
+        throw new Error(`Server returned an invalid response (Status ${response.status}). This usually means the server timed out or crashed.`);
+      }
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to parse resume");
+        throw new Error(result?.error || "Failed to parse resume");
       }
 
       const newVersion = {
