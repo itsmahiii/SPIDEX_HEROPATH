@@ -67,13 +67,15 @@ Return ONLY the raw JSON object, no markdown blocks, no other text.`;
       }
     }
 
-    // 4. Store in database (if userId is provided)
+    // 4. Store in database
     let resumeId = null;
-    if (userId && supabase) {
+    const finalUserId = userId || '00000000-0000-0000-0000-000000000000';
+
+    if (supabase) {
       const { data: insertData, error: insertError } = await supabase
         .from('resumes')
         .insert({
-          user_id: userId,
+          user_id: finalUserId,
           file_url: fileUrl,
           parsed_text: textContent,
           parsed_json: parsedJson,
@@ -84,6 +86,8 @@ Return ONLY the raw JSON object, no markdown blocks, no other text.`;
         
       if (!insertError && insertData) {
         resumeId = insertData.id;
+      } else if (insertError) {
+        console.error("Supabase insert error:", insertError);
       }
     }
 

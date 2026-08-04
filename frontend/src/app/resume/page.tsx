@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { supabase } from "@/utils/supabase";
 
 export default function ResumeOraclePage() {
   const calculatePercentile = (score: number, role: string) => {
@@ -38,12 +39,24 @@ export default function ResumeOraclePage() {
         }
       } catch (e) {}
     }
-    const savedVersions = localStorage.getItem("heropath_resume_versions");
-    if (savedVersions) {
-      try {
-        setVersions(JSON.parse(savedVersions));
-      } catch (e) {}
-    }
+    const fetchResumes = async () => {
+      if (!supabase) return;
+      const { data, error } = await supabase
+        .from('resumes')
+        .select('*')
+        .order('uploaded_at', { ascending: false });
+        
+      if (data && !error) {
+        const mapped = data.map(v => ({
+          id: v.id,
+          targetRole: v.target_role,
+          date: v.uploaded_at,
+          data: v.parsed_json
+        }));
+        setVersions(mapped);
+      }
+    };
+    fetchResumes();
   }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,9 +76,14 @@ export default function ResumeOraclePage() {
     setError("");
 
     try {
-      // Convert File to Base64 to avoid Vercel FormData binary corruption bugs
+      // Convert File to Base64 using standard browser APIs (Buffer is not available in Next.js client)
       const arrayBuffer = await file.arrayBuffer();
-      const base64String = Buffer.from(arrayBuffer).toString('base64');
+      const bytes = new Uint8Array(arrayBuffer);
+      let binary = '';
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      const base64String = btoa(binary);
 
       const response = await fetch("/api/parse", {
         method: "POST",
@@ -92,14 +110,13 @@ export default function ResumeOraclePage() {
       }
 
       const newVersion = {
-        id: Date.now().toString(),
+        id: result.resumeId || Date.now().toString(),
         targetRole,
         date: new Date().toISOString(),
         data: result.data
       };
       const updatedVersions = [newVersion, ...versions];
       setVersions(updatedVersions);
-      localStorage.setItem("heropath_resume_versions", JSON.stringify(updatedVersions));
       setParsedData(result.data);
     } catch (err: any) {
       setError(err.message);

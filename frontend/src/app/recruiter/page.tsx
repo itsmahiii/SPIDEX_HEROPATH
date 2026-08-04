@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { supabase } from "@/utils/supabase";
 
 export default function RecruiterPortalPage() {
   const [candidates, setCandidates] = useState<any[]>([]);
@@ -9,32 +10,33 @@ export default function RecruiterPortalPage() {
   const [filterRole, setFilterRole] = useState("");
 
   useEffect(() => {
-    // In a real app, this would fetch from a database table like `users` or `resumes`.
-    // For this MVP, we will mock it using the locally saved resume versions as distinct candidates.
-    const savedVersions = localStorage.getItem("heropath_resume_versions");
-    if (savedVersions) {
-      try {
-        const versions = JSON.parse(savedVersions);
-        // Map versions to mock "candidates"
-        const mockCandidates = versions.map((v: any, i: number) => ({
-          id: v.id || i,
-          name: i === 0 ? "You (Current User)" : `Candidate 00${i}`,
-          targetRole: v.targetRole || "Unknown",
-          date: new Date(v.date).toLocaleDateString(),
-          skills: v.data.skills || [],
-          experience: v.data.experience_claims?.length || 0,
-          atsScore: Math.floor(Math.random() * 30) + 70 // Mock ATS score for demo
+    const fetchCandidates = async () => {
+      if (!supabase) return;
+      const { data, error } = await supabase
+        .from('resumes')
+        .select(`
+          id,
+          target_role,
+          uploaded_at,
+          parsed_json,
+          users ( email )
+        `)
+        .order('uploaded_at', { ascending: false });
+
+      if (data && !error) {
+        const mappedCandidates = data.map((row: any, i: number) => ({
+          id: row.id,
+          name: row.users?.email || `Candidate 00${i}`,
+          targetRole: row.target_role || "Unknown",
+          date: new Date(row.uploaded_at).toLocaleDateString(),
+          skills: row.parsed_json?.skills || [],
+          experience: row.parsed_json?.experience_claims?.length || 0,
+          atsScore: row.parsed_json?.match_score || Math.floor(Math.random() * 30) + 70
         }));
-        setCandidates(mockCandidates);
-      } catch (e) {}
-    } else {
-      // Provide some dummy candidates if none exist locally
-      setCandidates([
-        { id: '1', name: 'Alice Smith', targetRole: 'Frontend Developer', date: '10/24/2023', skills: ['React', 'Next.js', 'CSS'], experience: 3, atsScore: 92 },
-        { id: '2', name: 'Bob Jones', targetRole: 'Backend Engineer', date: '10/25/2023', skills: ['Node.js', 'PostgreSQL', 'AWS'], experience: 5, atsScore: 88 },
-        { id: '3', name: 'Charlie Day', targetRole: 'Fullstack Dev', date: '10/26/2023', skills: ['React', 'Node.js', 'MongoDB'], experience: 2, atsScore: 75 },
-      ]);
-    }
+        setCandidates(mappedCandidates);
+      }
+    };
+    fetchCandidates();
   }, []);
 
   const filteredCandidates = candidates.filter(c => {

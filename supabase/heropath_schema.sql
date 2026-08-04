@@ -1,12 +1,14 @@
--- HeroPath MVP Schema (Supabase)
+-- HeroPath MVP Schema (Supabase) - No Auth (MVP Mode)
 
 -- 1. Users
--- Extending Supabase Auth (auth.users)
 CREATE TABLE users (
-    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    email VARCHAR(255) NOT NULL,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email VARCHAR(255) NOT NULL UNIQUE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Insert Dummy User
+INSERT INTO users (id, email) VALUES ('00000000-0000-0000-0000-000000000000', 'demo@heropath.ai') ON CONFLICT DO NOTHING;
 
 -- 2. Resumes
 CREATE TABLE resumes (
@@ -49,31 +51,5 @@ CREATE TABLE interview_sessions (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Enable RLS (Row Level Security) - Important for Supabase
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE resumes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE gap_analyses ENABLE ROW LEVEL SECURITY;
-ALTER TABLE roadmaps ENABLE ROW LEVEL SECURITY;
-ALTER TABLE interview_sessions ENABLE ROW LEVEL SECURITY;
-
--- Create Policies for RLS (Allowing users to access only their own data)
-CREATE POLICY "Users can view own data" ON users FOR SELECT USING (auth.uid() = id);
-CREATE POLICY "Users can update own data" ON users FOR UPDATE USING (auth.uid() = id);
-
-CREATE POLICY "Users can view own resumes" ON resumes FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own resumes" ON resumes FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can view own gap analyses" ON gap_analyses FOR SELECT USING (
-    resume_id IN (SELECT id FROM resumes WHERE user_id = auth.uid())
-);
-CREATE POLICY "Users can insert own gap analyses" ON gap_analyses FOR INSERT WITH CHECK (
-    resume_id IN (SELECT id FROM resumes WHERE user_id = auth.uid())
-);
-
-CREATE POLICY "Users can view own roadmaps" ON roadmaps FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can update own roadmaps" ON roadmaps FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own roadmaps" ON roadmaps FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can view own interviews" ON interview_sessions FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can update own interviews" ON interview_sessions FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert own interviews" ON interview_sessions FOR INSERT WITH CHECK (auth.uid() = user_id);
+-- WE ARE DISABLING RLS FOR THIS HACKATHON MVP
+-- All tables are publicly readable and writable by anyone with the Anon Key
