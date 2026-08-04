@@ -63,15 +63,20 @@ export default function ResumeOraclePage() {
     setError("");
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("targetRole", targetRole);
-      // For MVP without real auth integrated yet, you can pass a dummy userId or leave it blank
-      // formData.append("userId", "dummy-uuid-here");
+      // Convert File to Base64 to avoid Vercel FormData binary corruption bugs
+      const arrayBuffer = await file.arrayBuffer();
+      const base64String = Buffer.from(arrayBuffer).toString('base64');
 
       const response = await fetch("/api/parse", {
         method: "POST",
-        body: formData,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fileBase64: base64String,
+          fileName: file.name,
+          targetRole: targetRole,
+        }),
       });
 
       let result;

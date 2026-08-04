@@ -6,18 +6,15 @@ const pdfParse = require('pdf-parse');
 
 export async function POST(req: NextRequest) {
   try {
-    const formData = await req.formData();
-    const file = formData.get('file') as File | null;
-    const targetRole = formData.get('targetRole') as string | null;
-    const userId = formData.get('userId') as string | null;
+    const body = await req.json();
+    const { fileBase64, fileName, targetRole, userId } = body;
 
-    if (!file || !targetRole) {
+    if (!fileBase64 || !targetRole) {
       return NextResponse.json({ error: 'Missing file or target role' }, { status: 400 });
     }
 
     // 1. Parse PDF Text
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    const buffer = Buffer.from(fileBase64, 'base64');
     const pdfData = await pdfParse(buffer);
     const textContent = pdfData.text;
 
@@ -56,16 +53,16 @@ Return ONLY the raw JSON object, no markdown blocks, no other text.`;
     let fileUrl = 'local-demo-url.pdf';
     
     // Only upload to Supabase if the bucket exists and we have a valid client
-    if (supabase) {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+    if (supabase && fileName) {
+      const fileExt = fileName.split('.').pop();
+      const newFileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
       
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('resumes')
-        .upload(fileName, file);
+        .upload(newFileName, buffer, { contentType: 'application/pdf' });
         
       if (!uploadError && uploadData) {
-        const { data: publicUrlData } = supabase.storage.from('resumes').getPublicUrl(fileName);
+        const { data: publicUrlData } = supabase.storage.from('resumes').getPublicUrl(newFileName);
         fileUrl = publicUrlData.publicUrl;
       }
     }
@@ -101,4 +98,3 @@ Return ONLY the raw JSON object, no markdown blocks, no other text.`;
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
-
